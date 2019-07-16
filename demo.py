@@ -11,6 +11,7 @@ import sys
 import numpy as np
 from skimage import segmentation
 import torch.nn.init
+from os.path import splitext
 
 use_cuda = torch.cuda.is_available()
 
@@ -115,9 +116,9 @@ for batch_idx in range(args.maxIter):
     loss.backward()
     optimizer.step()
 
-    print (batch_idx, '/', args.maxIter, ':', nLabels, loss.data[0])
+    # print (batch_idx, '/', args.maxIter, ':', nLabels, loss.data[0])
     # for pytorch 1.0
-    # print (batch_idx, '/', args.maxIter, ':', nLabels, loss.item())
+    print (batch_idx, '/', args.maxIter, ':', nLabels, loss.item())
     if nLabels <= args.minLabels:
         print ("nLabels", nLabels, "reached minLabels", args.minLabels, ".")
         break
@@ -130,4 +131,4 @@ if not args.visualize:
     im_target = target.data.cpu().numpy()
     im_target_rgb = np.array([label_colours[ c % 100 ] for c in im_target])
     im_target_rgb = im_target_rgb.reshape( im.shape ).astype( np.uint8 )
-cv2.imwrite( "output.png", im_target_rgb )
+cv2.imwrite( splitext(args.input)[0] + '_segmented.png', im_target_rgb )
